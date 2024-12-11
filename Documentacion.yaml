@@ -1,25 +1,70 @@
 openapi: 3.0.0
 info:
   title: Twitter API Documentation
+  description: API para la búsqueda de tweets recientes en Twitter.
   version: 1.0.0
+
 paths:
   /2/tweets/search/recent:
     get:
-      summary: Search recent tweets.
+      summary: Obtener tweets recientes con un hashtag o palabra clave.
       parameters:
         - name: query
           in: query
+          description: El término de búsqueda o hashtag para buscar en los tweets.
           required: true
-          description: Search query.
           schema:
             type: string
+            example: "#tecnología"
         - name: max_results
           in: query
+          description: El número máximo de resultados a devolver (hasta 100).
           required: false
-          description: Max number of results.
           schema:
             type: integer
             default: 10
+            example: 50
+        - name: tweet.fields
+          in: query
+          description: Campos adicionales para incluir en la respuesta (como texto, fecha de creación, métricas, etc.).
+          required: false
+          schema:
+            type: string
+            example: "text,created_at,author_id,public_metrics"
       responses:
-        200:
-          description: Successful response.
+        '200':
+          description: Respuesta exitosa con los tweets encontrados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        text:
+                          type: string
+                          example: "Este es un tweet sobre tecnología."
+                        author_id:
+                          type: string
+                          example: "123456789"
+                        created_at:
+                          type: string
+                          example: "2024-12-11T04:45:35.000Z"
+                        public_metrics:
+                          type: object
+                          properties:
+                            retweet_count:
+                              type: integer
+                              example: 47
+                            like_count:
+                              type: integer
+                              example: 0
+        '400':
+          description: Solicitud incorrecta, parámetros inválidos.
+        '429':
+          description: Demasiadas solicitudes en un corto período de tiempo (rate limit).
+        '500':
+          description: Error interno del servidor.
